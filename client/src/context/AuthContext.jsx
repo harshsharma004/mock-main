@@ -7,6 +7,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../services/api";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../services/firebase";
 
 const AuthContext = createContext(null);
 
@@ -54,6 +56,21 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // ── Google Login ─────────────────────────────────────────────────────────
+  const loginWithGoogle = async () => {
+    // 1. Popup Google authentication via Firebase client
+    const result = await signInWithPopup(auth, googleProvider);
+    const idToken = await result.user.getIdToken();
+
+    // 2. Exchange token for local JWT
+    const res = await api.post("/auth/google", { idToken });
+    
+    // 3. Store JWT and set local user state
+    localStorage.setItem("token", res.data.token);
+    setUser(res.data.user);
+    return res.data;
+  };
+
   // ── Show nothing while checking token on first load ───────────────────────
   if (loading) {
     return (
@@ -82,7 +99,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: false, // Optional for Google sign-in users
       minlength: 8,
       select: false, // never returned in queries by default
     },

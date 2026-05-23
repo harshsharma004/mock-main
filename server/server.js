@@ -8,13 +8,6 @@
  *  - Mount route handlers
  *  - Start the HTTP server
  */
-// Add this import near the top with your other requires
-const firebaseAuth = require("./middleware/firebaseAuth");
-
-// ─── Routes ──────────────────────────────────────────────────────────────────
-
-app.use("/api/interview", interviewRoutes);
-app.use("/api/auth", firebaseAuth, authRoutes); // ← firebaseAuth guards all /api/auth routes
 require("dotenv").config(); // Load .env into process.env
 
 const express        = require("express");

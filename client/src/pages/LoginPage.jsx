@@ -6,10 +6,24 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";  // ← real auth
+import logo from "../assets/logo.png";
 
 export default function LoginPage() {
   const navigate  = useNavigate();
-  const { login } = useAuth();  // ← replaces mock setTimeout
+  const { login, loginWithGoogle } = useAuth();  // ← replaces mock setTimeout
+
+  const handleGoogleLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      navigate("/home");
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || "Google authentication failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
@@ -42,8 +56,17 @@ export default function LoginPage() {
       {/* NAV */}
       <nav style={s.nav}>
         <Link to="/landing" style={s.logo}>
-          <div style={s.logoIcon}>🤖</div>
-          AiMock
+          <img
+            src={logo}
+            alt="MockVerse Logo"
+            style={{
+              width: "40px",
+              height: "40px",
+              display: "inline-block",
+              objectFit: "contain",
+            }}
+          />
+          MockVerse
         </Link>
         <span style={s.navRight}>
           Don't have an account?{" "}
@@ -106,7 +129,7 @@ export default function LoginPage() {
               <p style={s.formSub}>Enter your credentials to access your dashboard</p>
             </div>
 
-            <button style={s.googleBtn} className="google-btn">
+            <button onClick={handleGoogleLogin} style={s.googleBtn} className="google-btn" disabled={loading}>
               <GoogleIcon />
               Continue with Google
             </button>

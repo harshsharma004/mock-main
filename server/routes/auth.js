@@ -110,6 +110,59 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// ── POST /api/auth/google ──────────────────────────────────────────────────
+router.post("/google", async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ message: "Firebase ID token is required." });
+    }
+
+    const admin = require("../config/firebase");
+
+    // 1. Verify token with Firebase Admin
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const { email, name, picture } = decodedToken;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email not provided by Google account." });
+    }
+
+    // 2. Find or Create User in MongoDB
+    let user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      // Split name into firstName and lastName
+      const nameParts = name ? name.split(" ") : ["Google", "User"];
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(" ") || "User";
+
+      user = await User.create({
+        firstName,
+        lastName,
+        email: email.toLowerCase(),
+      });
+    }
+
+    // 3. Sign local JWT token
+    const token = signToken(user._id);
+
+    res.status(200).json({
+      message: "Google login successful.",
+      token,
+      user: {
+        id:        user._id,
+        firstName: user.firstName,
+        lastName:  user.lastName,
+        email:     user.email,
+        picture,
+      },
+    });
+  } catch (err) {
+    console.error("Google authentication error:", err);
+    res.status(401).json({ message: "Invalid or expired Google credential." });
+  }
+});
+
 // ── GET /api/auth/me ───────────────────────────────────────────────────────
 router.get("/me", protect, async (req, res) => {
   res.status(200).json({

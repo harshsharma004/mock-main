@@ -176,15 +176,24 @@ export default function LandingPage() {
       {/* ── FOOTER ──────────────────────────────── */}
       <footer style={s.footer}>
         <div style={s.logo}>
-          <div style={{ ...s.logoIcon, width: 26, height: 26, fontSize: 12, borderRadius: 7 }}>🤖</div>
-          AiMock
+          <img
+            src={logo}
+            alt="MockVerse Logo"
+            style={{
+              width: "30px",
+              height: "30px",
+              display: "inline-block",
+              objectFit: "contain",
+            }}
+          />
+          MockVerse
         </div>
         <div style={{ display: "flex", gap: "1.5rem" }}>
           {["Privacy", "Terms", "Contact"].map((l) => (
             <a key={l} href="#" style={s.footerLink}>{l}</a>
           ))}
         </div>
-        <span style={{ color: "#7a7e9a", fontSize: "0.85rem" }}>© 2025 AiMock. All rights reserved.</span>
+        <span style={{ color: "#7a7e9a", fontSize: "0.85rem" }}>© 2026 MockVerse. All rights reserved.</span>
       </footer>
     </div>
   );

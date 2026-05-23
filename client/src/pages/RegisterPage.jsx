@@ -6,6 +6,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";  // ← real auth
+import logo from "../assets/logo.png";
 
 const ROLES_PREVIEW = [
   { emoji: "🎨", name: "Frontend Dev"    },
@@ -40,7 +41,20 @@ function getStrength(val) {
 
 export default function RegisterPage() {
   const navigate      = useNavigate();
-  const { register }  = useAuth();  // ← replaces mock setTimeout
+  const { register, loginWithGoogle }  = useAuth();  // ← replaces mock setTimeout
+
+  const handleGoogleRegister = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      navigate("/home");
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || "Google authentication failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [form,    setForm]    = useState({ firstName: "", lastName: "", email: "", password: "", confirmPw: "" });
   const [showPw,  setShowPw]  = useState(false);
@@ -84,8 +98,17 @@ export default function RegisterPage() {
       {/* NAV */}
       <nav style={s.nav}>
         <Link to="/landing" style={s.logo}>
-          <div style={s.logoIcon}>🤖</div>
-          AiMock
+          <img
+            src={logo}
+            alt="MockVerse Logo"
+            style={{
+              width: "40px",
+              height: "40px",
+              display: "inline-block",
+              objectFit: "contain",
+            }}
+          />
+          MockVerse
         </Link>
         <span style={s.navRight}>
           Already have an account?{" "}
@@ -144,7 +167,7 @@ export default function RegisterPage() {
               <p style={s.formSub}>Start practicing for free — no credit card required</p>
             </div>
 
-            <button style={s.googleBtn} className="google-btn">
+            <button onClick={handleGoogleRegister} style={s.googleBtn} className="google-btn" disabled={loading}>
               <GoogleIcon />
               Sign up with Google
             </button>
