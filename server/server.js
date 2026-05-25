@@ -75,6 +75,10 @@ const connectDB = async () => {
   }
 
   try {
+    if (process.env.NODE_ENV === "production") {
+      console.error("❌ MongoDB connection failed in production. Please check your Atlas IP whitelist.");
+      process.exit(1);
+    }
     const { MongoMemoryServer } = require("mongodb-memory-server");
     const memServer = await MongoMemoryServer.create();
     const memUri    = memServer.getUri();
