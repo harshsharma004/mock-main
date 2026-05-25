@@ -30,7 +30,8 @@ app.use(
       if (!origin) return callback(null, true);
       // Allow ANY localhost port — no matter what port Vite picks
       if (origin.match(/^http:\/\/localhost:\d+$/)) return callback(null, true);
-      callback(new Error("Not allowed by CORS"));
+      // Allow deployed frontend origin
+      return callback(null, true);
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,

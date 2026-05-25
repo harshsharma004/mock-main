@@ -55,8 +55,9 @@ api.interceptors.response.use(
 // ─── Multipart Form helper (for resume PDF uploads) ───────────────────────────
 export const apiPostForm = async (url, formData) => {
   const token = localStorage.getItem("token");
+  const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5173/api";
   return await axios
-    .post("http://localhost:5173/api" + url, formData, {
+    .post(baseURL + url, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
